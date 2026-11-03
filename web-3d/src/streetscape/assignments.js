@@ -6,7 +6,7 @@ import { placeModelOnLot } from './siteLayout';
 export const DEFAULT_SETTINGS = {
   mode: 'mixed', // 'mixed' or a single model id
   enabledModels: HOUSE_MODELS.map((model) => model.id),
-  respectSetbacks: true,
+  respectSetbacks: false,
   garageSides: 'alternate', // 'alternate' | 'right' | 'left' | 'random'
   colorMode: 'brochure', // 'brochure' | 'varied'
   landscape: 'lush', // preset id | 'varied'
