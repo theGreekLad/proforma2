@@ -424,6 +424,28 @@ function CameraRig({ mode, view, controlsRef, onModeChange }) {
     s.anim.toYaw = s.anim.fromYaw + dy;
   }, [view, camera]);
 
+  // Keys are tracked in every mode: street view walks, aerial view pans.
+  useEffect(() => {
+    const s = st.current;
+    const key = (e, value) => {
+      if (e.target.closest?.('input, select, textarea')) return;
+      s.keys[e.key.toLowerCase()] = value;
+    };
+    const kd = (e) => key(e, true);
+    const ku = (e) => key(e, false);
+    const clear = () => {
+      s.keys = {};
+    };
+    window.addEventListener('keydown', kd);
+    window.addEventListener('keyup', ku);
+    window.addEventListener('blur', clear);
+    return () => {
+      window.removeEventListener('keydown', kd);
+      window.removeEventListener('keyup', ku);
+      window.removeEventListener('blur', clear);
+    };
+  }, []);
+
   useEffect(() => {
     if (mode !== 'street') return undefined;
     const el = gl.domElement;
@@ -450,25 +472,15 @@ function CameraRig({ mode, view, controlsRef, onModeChange }) {
       camera.fov = THREE.MathUtils.clamp(camera.fov + Math.sign(e.deltaY) * 3, 22, 80);
       camera.updateProjectionMatrix();
     };
-    const key = (e, value) => {
-      if (e.target.closest?.('input, select, textarea')) return;
-      s.keys[e.key.toLowerCase()] = value;
-    };
-    const kd = (e) => key(e, true);
-    const ku = (e) => key(e, false);
     el.addEventListener('pointerdown', down);
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
     el.addEventListener('wheel', wheel, { passive: false });
-    window.addEventListener('keydown', kd);
-    window.addEventListener('keyup', ku);
     return () => {
       el.removeEventListener('pointerdown', down);
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
       el.removeEventListener('wheel', wheel);
-      window.removeEventListener('keydown', kd);
-      window.removeEventListener('keyup', ku);
     };
   }, [mode, gl, camera]);
 
@@ -494,14 +506,36 @@ function CameraRig({ mode, view, controlsRef, onModeChange }) {
       if (a.t >= 1) s.anim = null;
       return;
     }
+    const k = s.keys;
     if (mode !== 'street') {
       const forward = new THREE.Vector3();
       camera.getWorldDirection(forward);
       s.yaw = Math.atan2(-forward.x, -forward.z);
       s.pitch = Math.asin(THREE.MathUtils.clamp(forward.y, -1, 1));
+      const controls = controlsRef.current;
+      if (controls) {
+        // Pan across the ground: up/down move toward/away from where the camera
+        // faces, left/right slide sideways. Speed scales with how far out you are.
+        const dist = camera.position.distanceTo(controls.target);
+        const step = dist * (k.shift ? 1.5 : 0.6) * dt;
+        const fwd = new THREE.Vector3(forward.x, 0, forward.z);
+        if (fwd.lengthSq() < 1e-6) fwd.set(-Math.sin(s.yaw), 0, -Math.cos(s.yaw));
+        fwd.normalize();
+        const right = new THREE.Vector3(-fwd.z, 0, fwd.x);
+        const pan = new THREE.Vector3();
+        if (k.w || k.arrowup) pan.add(fwd);
+        if (k.s || k.arrowdown) pan.sub(fwd);
+        if (k.a || k.arrowleft) pan.sub(right);
+        if (k.d || k.arrowright) pan.add(right);
+        if (pan.lengthSq() > 0) {
+          pan.normalize().multiplyScalar(step);
+          camera.position.add(pan);
+          controls.target.add(pan);
+          controls.update();
+        }
+      }
       return;
     }
-    const k = s.keys;
     const speed = (k.shift ? 90 : 36) * dt;
     const fwd = new THREE.Vector3(-Math.sin(s.yaw), 0, -Math.cos(s.yaw));
     const right = new THREE.Vector3(Math.cos(s.yaw), 0, -Math.sin(s.yaw));

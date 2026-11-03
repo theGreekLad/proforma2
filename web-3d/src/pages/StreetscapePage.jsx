@@ -512,7 +512,7 @@ export default function StreetscapePage() {
         <p className="ss-help">
           {mode === 'street'
             ? 'Drag to look · W A S D / arrows to walk (Shift = faster, R/F = up/down) · scroll to change lens · click a home to customize it'
-            : 'Drag to orbit · scroll to zoom · click a street to stand there · click a home to customize it'}
+            : 'Drag to orbit · W A S D / arrows to pan (Shift = faster) · scroll to zoom · click a street to stand there · click a home to customize it'}
         </p>
 
         {selectedLot && selectedAssignment && (
