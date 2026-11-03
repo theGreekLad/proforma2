@@ -451,3 +451,61 @@ button {
     justify-content: flex-start;
   }
 }
+
+.crossmod-rendering {
+  position: relative;
+}
+
+.design-card-media img.rendering.rendering-wide {
+  aspect-ratio: 16 / 9;
+}
+
+.rendering-busy {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(15, 20, 25, 0.78);
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.rendering-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.55rem 0.75rem;
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+}
+
+.rendering-controls select,
+.rendering-controls button {
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.rendering-controls select {
+  flex: 1 1 6rem;
+  min-width: 0;
+}
+
+.rendering-controls button {
+  font-weight: 600;
+  color: var(--accent-light);
+  border-color: rgba(61, 154, 139, 0.4);
+  background: rgba(61, 154, 139, 0.16);
+  cursor: pointer;
+}
+
+.rendering-controls button:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
