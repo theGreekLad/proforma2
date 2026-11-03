@@ -130,13 +130,13 @@ export function getPlantGeometries() {
 }
 
 const tmpColor = new THREE.Color();
-function vary(hex, rand, amount = 0.06) {
+export function vary(hex, rand, amount = 0.06) {
   tmpColor.set(hex);
   tmpColor.offsetHSL((rand() - 0.5) * amount * 0.5, (rand() - 0.5) * amount, (rand() - 0.5) * amount);
   return tmpColor.getHex();
 }
 
-const C = {
+export const C = {
   boxwood: '#2f5a26',
   shrub: '#3f6e2c',
   youngShrub: '#4f7d33',
@@ -163,7 +163,7 @@ const C = {
   barkLight: '#7a6a58',
 };
 
-class PlantSink {
+export class PlantSink {
   constructor() {
     this.items = Object.fromEntries(PLANT_TYPES.map((type) => [type, []]));
     this.streetTreeCandidates = [];
@@ -279,7 +279,7 @@ function mirrorX(model, x, mirror) {
   return mirror ? -X : X;
 }
 
-function bedPlants(sink, pl, X0, X1, Zwall, depth, preset, rand, model) {
+export function bedPlants(sink, pl, X0, X1, Zwall, depth, preset, rand, model) {
   const length = Math.abs(X1 - X0);
   const lo = Math.min(X0, X1);
   const at = (X, Z) => pl.toWorld(X, Z);
