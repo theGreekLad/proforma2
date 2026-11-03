@@ -6,6 +6,7 @@ import { appUrl } from '../data/platUrls';
 
 function designTag(design) {
   if (design.series === 'crossmod') return 'CrossMod';
+  if (design.series === 'modern') return 'Modern · Single-Family';
   if (design.category === 'single-family') return 'Single-Family';
   return 'Townhome / Fourplex';
 }
@@ -114,7 +115,7 @@ function DesignGrid({ designs }) {
               <img className="rendering" src={design.renderingUrl} alt={`${design.name} rendering`} loading="lazy" />
             )}
             <img
-              className={`layout${design.series === 'crossmod' ? ' layout-plan' : ''}`}
+              className={`layout${design.series === 'crossmod' || design.series === 'modern' ? ' layout-plan' : ''}`}
               src={design.layoutUrl}
               alt={`${design.name} floor plan`}
               loading="lazy"
@@ -153,7 +154,10 @@ export default function LayoutsPage() {
   const designs = useMemo(() => getPrimaryDesignLayouts(), []);
 
   const concepts = designs.filter(
-    (design) => design.series !== 'crossmod' && (filter === 'all' || design.category === filter),
+    (design) => design.series === 'concept' && (filter === 'all' || design.category === filter),
+  );
+  const modern = designs.filter(
+    (design) => design.series === 'modern' && (filter === 'all' || design.category === filter),
   );
   const crossmod = designs.filter(
     (design) =>
@@ -206,6 +210,14 @@ export default function LayoutsPage() {
               the sheets from each plan PDF.
             </p>
             <DesignGrid designs={crossmod} />
+          </>
+        )}
+
+        {modern.length > 0 && (
+          <>
+            <h3 className="section-label">Modern plans</h3>
+            <p className="section-note">Builder photo and marketing floor plan.</p>
+            <DesignGrid designs={modern} />
           </>
         )}
 

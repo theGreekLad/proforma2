@@ -1,6 +1,6 @@
 /** @typedef {'gable' | 'low-pitch' | 'craftsman-gable'} RoofType */
 /** @typedef {'fourplex' | 'single-family' | 'crossmod'} BuildingCategory */
-/** @typedef {'concept' | 'crossmod'} DesignSeries */
+/** @typedef {'concept' | 'crossmod' | 'modern'} DesignSeries */
 
 /**
  * @typedef {Object} BuildingStyle
@@ -291,6 +291,30 @@ export const BUILDING_CATALOG = [
       trim: '#f7f5f0',
       roofType: 'gable',
       wallHeight: 8,
+    },
+  },
+  {
+    id: 'modern-ranch',
+    name: 'Modern Ranch',
+    shortName: 'Modern Ranch',
+    category: 'single-family',
+    series: 'modern',
+    width: 76,
+    depth: 40,
+    renderingUrl: './building-assets/modern-ranch-rendering.jpg',
+    layoutUrl: './building-assets/modern-ranch-layout.png',
+    dwellingSqFt: '≈2,450 SF',
+    description:
+      'Modern single-story with low shed roofs: a grey stucco garage wing, a cedar-clad recessed entry under a pergola, and a white board-and-batten bedroom wing. 3 bedrooms plus den, 3 baths, open living/dining/great room and a covered rear porch. The garage in the photo is built on site and is not on the floor plan.',
+    style: {
+      bodyLight: '#f2f1ec',
+      bodyDark: '#6e6f70',
+      roof: '#3a3b3d',
+      stone: '#d8cdb4',
+      garage: '#6e6f70',
+      trim: '#a5683f',
+      roofType: 'low-pitch',
+      wallHeight: 10,
     },
   },
 ];
