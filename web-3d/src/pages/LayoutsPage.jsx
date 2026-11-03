@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import SiteNav from '../components/SiteNav';
 import { getPrimaryDesignLayouts, ADDITIONAL_LAYOUT_SHEETS } from '../data/layoutsGallery';
 import { appUrl } from '../data/platUrls';
+import { SHARE_MODE, withShare } from '../utils/shareMode';
 
 function designTag(design) {
   if (design.series === 'crossmod') return 'CrossMod';
@@ -30,7 +31,7 @@ function DesignGrid({ designs }) {
             <p>{design.description}</p>
             <div className="design-card-actions">
               <a
-                href={`${appUrl('design-viewer.html')}?design=${encodeURIComponent(design.id)}`}
+                href={withShare(`${appUrl('design-viewer.html')}?design=${encodeURIComponent(design.id)}`)}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -52,11 +53,12 @@ const FILTERS = [
 ];
 
 export default function LayoutsPage() {
-  const [filter, setFilter] = useState('all');
+  // Share mode is the CrossMod plans only, with no filters or other sections.
+  const [filter, setFilter] = useState(SHARE_MODE ? 'crossmod' : 'all');
   const designs = useMemo(() => getPrimaryDesignLayouts(), []);
 
   const concepts = designs.filter(
-    (design) => design.series !== 'crossmod' && (filter === 'all' || design.category === filter),
+    (design) => !SHARE_MODE && design.series !== 'crossmod' && (filter === 'all' || design.category === filter),
   );
   const crossmod = designs.filter(
     (design) =>
@@ -64,20 +66,25 @@ export default function LayoutsPage() {
       (filter === 'all' || filter === 'crossmod' || filter === 'single-family'),
   );
   const sheets = ADDITIONAL_LAYOUT_SHEETS.filter(
-    (sheet) => filter === 'all' || sheet.category === filter,
+    (sheet) => !SHARE_MODE && (filter === 'all' || sheet.category === filter),
   );
 
   return (
     <div className="gallery-app">
       <header className="gallery-header">
         <div>
-          <h1>Layouts</h1>
-          <p>Floor plans, product sheets, and exterior renderings · Delta Crossing</p>
+          <h1>{SHARE_MODE ? 'CrossMod Layouts' : 'Layouts'}</h1>
+          <p>
+            {SHARE_MODE
+              ? 'Clayton CrossMod floor plans and exterior renderings · Delta Crossing'
+              : 'Floor plans, product sheets, and exterior renderings · Delta Crossing'}
+          </p>
         </div>
         <SiteNav current="layouts" />
       </header>
 
       <main className="gallery-main">
+        {!SHARE_MODE && (
         <section className="gallery-hero">
           <h2>Building layouts &amp; renderings</h2>
           <p>
@@ -85,7 +92,9 @@ export default function LayoutsPage() {
             from the front elevation with the floor plan from the plan set.
           </p>
         </section>
+        )}
 
+        {!SHARE_MODE && (
         <div className="gallery-filters" role="tablist" aria-label="Design category">
           {FILTERS.map((entry) => (
             <button
@@ -99,6 +108,7 @@ export default function LayoutsPage() {
             </button>
           ))}
         </div>
+        )}
 
         {crossmod.length > 0 && (
           <>

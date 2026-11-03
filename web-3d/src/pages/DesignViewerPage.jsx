@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { getDesignById, BUILDING_CATALOG } from '../data/buildingCatalog';
 import { appUrl } from '../data/platUrls';
+import { SHARE_MODE } from '../utils/shareMode';
 
 function readDesignId() {
   const params = new URLSearchParams(window.location.search);
@@ -39,9 +40,11 @@ export default function DesignViewerPage() {
           <h1>{design.name}</h1>
           <p className="design-viewer-summary">{summary}</p>
         </div>
-        <a className="btn" href={appUrl('index.html')}>
-          Back to 3D View
-        </a>
+        {!SHARE_MODE && (
+          <a className="btn" href={appUrl('index.html')}>
+            Back to 3D View
+          </a>
+        )}
       </header>
 
       <main className="design-viewer-scroll">

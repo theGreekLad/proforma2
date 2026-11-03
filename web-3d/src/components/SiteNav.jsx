@@ -1,11 +1,14 @@
-﻿import React from 'react';
+import React from 'react';
 import { platUrl, appUrl } from '../data/platUrls';
+import { SHARE_MODE } from '../utils/shareMode';
 
 /**
  * Shared top-nav links used across 3D app pages.
  * @param {'plat' | '3d' | 'streetscape' | 'concepts' | 'layouts' | 'area' | 'proforma' | null} current
  */
 export default function SiteNav({ current = null, extra = null, className = 'header-actions' }) {
+  if (SHARE_MODE) return null;
+
   const links = [
     { id: 'plat', label: 'Plat Map', href: platUrl('index.html') },
     { id: '3d', label: '3D View', href: appUrl('index.html') },
