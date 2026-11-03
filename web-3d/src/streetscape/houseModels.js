@@ -1,15 +1,25 @@
 /**
- * CrossMod home models from the Clayton Built plan sets (floor plan A1.0 and
- * front elevation A2.0 of each PDF), authored in feet.
+ * CrossMod home models measured from the Clayton Built plan sets: floor plan
+ * (A1.0) for footprints and the four exterior elevations (A2.0) for every
+ * window, door, lamp, porch post, roof break and stoop. Dimensions in feet.
  *
  * Authoring frame: x runs left → right as seen from the street (0 .. width),
- * d is depth from the front-most wall plane of the main house (negative values
- * project toward the street, e.g. a garage that sits forward of the house).
- * All models are the "_R" (right-garage) variants; the builder mirrors them for
+ * d is depth from the front wall of the main house (negative values project
+ * toward the street, e.g. a garage that sits forward of the house).
+ * All models are the "_R" (right-garage) plans; the builder mirrors them for
  * left-garage placements.
+ *
+ * Openings: { type, face, at, pos, ... }
+ *   face 'front' | 'rear' → at = wall depth d, pos = x
+ *   face 'left' | 'right' → at = wall x,      pos = d
+ *   window sizes default to a 3660 (3' × 5'); size '2436' is 2' × 3'.
+ *   Heads sit 6'-8" above the floor like the elevations.
  */
 
 const ASSET = './building-assets/crossmod';
+
+const win = (face, at, pos, extra = {}) => ({ type: 'window', face, at, pos, ...extra });
+const small = (face, at, pos, extra = {}) => ({ type: 'window', face, at, pos, size: '2436', ...extra });
 
 export const HOUSE_MODELS = [
   {
@@ -20,37 +30,52 @@ export const HOUSE_MODELS = [
     sqft: 1620,
     bedrooms: 3,
     baths: 2,
-    features: 'Craftsman porch with tapered columns on stone piers, front-load 2-car garage, optional office/flex.',
+    features: 'Craftsman porch with tapered columns on stone piers, front-load 2-car garage, rear slider to a raised patio; optional office/flex.',
     width: 64,
     renderingUrl: `${ASSET}/hawthorne-rendering.jpg`,
     planUrl: `${ASSET}/hawthorne-plan.jpg`,
     elevationUrl: `${ASSET}/hawthorne-elev.jpg`,
     defaultPalette: 'hawthorne-brochure',
     masses: [
-      { kind: 'house', x0: 0, x1: 64, d0: 0, d1: 30, roof: { ridge: 'x', gable: 'lap' }, autoWindows: ['left', 'rear'] },
-      { kind: 'garage', x0: 44, x1: 64, d0: -5, d1: 15, roof: { ridge: 'd', gable: 'shake', backTo: 10 } },
+      { kind: 'house', x0: 0, x1: 64, d0: 0, d1: 30 },
+      { kind: 'garage', x0: 44, x1: 64, d0: -5, d1: 15 },
+    ],
+    roofs: [
+      { x0: 0, x1: 64, d0: 0, d1: 30, ridge: 'x', left: 'lap', right: 'lap' },
+      { x0: 44, x1: 64, d0: -5, d1: 10.5, ridge: 'd', front: 'shake', back: null },
     ],
     porch: {
-      x0: 10.5, x1: 30.5, d0: -6, d1: 0,
-      roof: { gable: 'shake', backTo: 8 },
-      posts: [11.2, 29.8],
+      x0: 10.2, x1: 30.8, d0: -6.5, d1: 0,
+      roof: { gable: 'shake', backTo: 10.5 },
+      posts: [10.75, 30.25],
       postStyle: 'craftsman',
-      steps: { x: 13.5, width: 5 },
+      steps: { x: 14, width: 7.8, count: 1 },
     },
-    garageDoor: { x: 54, d: -5, width: 16, height: 7 },
-    front: [
-      { type: 'window', x: 5.8, d: 0, w: 3, h: 5, shutters: true },
-      { type: 'door', x: 13.5, d: 0 },
-      { type: 'window', x: 22.4, d: 0, w: 3, h: 5, twin: true, shutters: true },
-      { type: 'window', x: 37.8, d: 0, w: 3, h: 5, shutters: true },
-      { type: 'lamp', x: 16, d: 0, v: 6.4 },
-      { type: 'lamp', x: 45.4, d: -5, v: 7.2, onGarage: true },
-      { type: 'lamp', x: 62.6, d: -5, v: 7.2, onGarage: true },
+    garageDoor: { x: 54, d: -5, width: 16.2, height: 7.1 },
+    openings: [
+      win('front', 0, 5.9, { shutters: 'both' }),
+      { type: 'door', face: 'front', at: 0, pos: 13.9 },
+      { type: 'lamp', face: 'front', at: 0, pos: 16.4, v: 6.2 },
+      win('front', 0, 22.4, { shutters: 'left' }),
+      win('front', 0, 25.9, { shutters: 'right' }),
+      win('front', 0, 39.1, { shutters: 'both' }),
+      { type: 'lamp', face: 'front', at: -5, pos: 44.9, v: 6.9, onGarage: true },
+      { type: 'lamp', face: 'front', at: -5, pos: 63.0, v: 6.9, onGarage: true },
+      win('left', 0, 22.4),
+      small('right', 64, 16.7),
+      { type: 'transom', face: 'rear', at: 30, pos: 60.9 },
+      win('rear', 30, 56.0),
+      win('rear', 30, 48.1),
+      small('rear', 30, 31.1),
+      small('rear', 30, 28.6),
+      { type: 'lamp', face: 'rear', at: 30, pos: 25.2, v: 6.2 },
+      { type: 'slider', face: 'rear', at: 30, pos: 20.8 },
     ],
+    decks: [{ x0: 15.8, x1: 25.9, d0: 30, d1: 40 }],
     plantingBeds: [
-      { x0: 0.5, x1: 10.5, d: 0 },
-      { x0: 16.5, x1: 30.5, d: -6 },
-      { x0: 30.5, x1: 44, d: 0 },
+      { x0: 0.5, x1: 10.2, d: 0 },
+      { x0: 18.1, x1: 30.8, d: -6.5 },
+      { x0: 30.8, x1: 44, d: 0 },
     ],
   },
   {
@@ -62,33 +87,53 @@ export const HOUSE_MODELS = [
     bedrooms: 3,
     baths: 2,
     features: 'Narrow-lot front gable with covered porch, work-from-home room and flex space; 4th bedroom option.',
-    width: 35,
+    width: 34.5,
     renderingUrl: `${ASSET}/aspen-rendering.jpg`,
     planUrl: `${ASSET}/aspen-plan.jpg`,
     elevationUrl: `${ASSET}/aspen-elev.jpg`,
     defaultPalette: 'aspen-brochure',
     masses: [
-      { kind: 'house', x0: 0, x1: 30, d0: 0, d1: 60, roof: { ridge: 'd', gable: 'shake', frontAt: -6 }, autoWindows: ['left', 'right', 'rear'] },
-      { kind: 'garage', x0: 15, x1: 35, d0: -8, d1: 12, roof: { ridge: 'd', gable: 'shake' } },
+      { kind: 'house', x0: 0, x1: 30, d0: 0, d1: 60 },
+      { kind: 'garage', x0: 14.5, x1: 34.5, d0: -8.4, d1: 11.8 },
+    ],
+    roofs: [
+      // Front 20' carries one wide gable over house + garage; the rear roof is narrower and ~1' lower.
+      { x0: 0, x1: 34.5, d0: -6, d1: 12.3, ridge: 'd', front: 'shake', back: 'lap' },
+      { x0: 0, x1: 30, d0: 12.3, d1: 60, ridge: 'd', front: null, back: 'lap' },
+      { x0: 14.5, x1: 34.5, d0: -8.4, d1: -5.8, ridge: 'd', front: 'shake', back: null },
     ],
     porch: {
-      x0: 0, x1: 15, d0: -6, d1: 0,
+      x0: 0, x1: 14.5, d0: -6, d1: 0,
       roof: null,
-      posts: [0.5, 14.4],
+      posts: [0.3, 9.7],
       postStyle: 'square',
-      steps: { x: 2.6, width: 4.5 },
+      steps: { x: 2.8, width: 5.6, count: 2 },
     },
-    garageDoor: { x: 25, d: -8, width: 16, height: 7 },
-    front: [
-      { type: 'door', x: 2.6, d: 0 },
-      { type: 'window', x: 9.4, d: 0, w: 2.8, h: 5, twin: true, shutters: true },
-      { type: 'lamp', x: 5, d: 0, v: 6.4 },
-      { type: 'lamp', x: 16.3, d: -8, v: 7.2, onGarage: true },
-      { type: 'lamp', x: 33.7, d: -8, v: 7.2, onGarage: true },
+    garageDoor: { x: 24.6, d: -8.4, width: 16.4, height: 7.3 },
+    openings: [
+      { type: 'door', face: 'front', at: 0, pos: 2.3 },
+      { type: 'lamp', face: 'front', at: 0, pos: 4.6, v: 6.3 },
+      win('front', 0, 8.0, { w: 2.8, h: 4.8, shutters: 'left' }),
+      win('front', 0, 11.5, { w: 2.8, h: 4.8, shutters: 'right' }),
+      { type: 'lamp', face: 'front', at: -8.4, pos: 15.4, v: 7.0, onGarage: true },
+      { type: 'lamp', face: 'front', at: -8.4, pos: 33.6, v: 7.0, onGarage: true },
+      win('left', 0, 10.0),
+      win('left', 0, 24.9),
+      win('left', 0, 34.0),
+      small('left', 0, 41.0),
+      small('left', 0, 43.5),
+      win('right', 30, 17.0),
+      { type: 'transom', face: 'right', at: 30, pos: 29.6 },
+      win('right', 30, 37.1),
+      win('right', 30, 49.3),
+      win('rear', 60, 22.4),
+      win('rear', 60, 18.9),
+      { type: 'door', face: 'rear', at: 60, pos: 13.0, style: 'nineLite' },
+      { type: 'lamp', face: 'rear', at: 60, pos: 10.2, v: 6.3 },
+      win('rear', 60, 7.4),
     ],
-    plantingBeds: [
-      { x0: 5.2, x1: 15, d: -6 },
-    ],
+    decks: [{ x0: 8, x1: 18, d0: 60, d1: 64 }],
+    plantingBeds: [{ x0: 5.8, x1: 14.5, d: -6 }],
   },
   {
     id: 'belmont',
@@ -98,34 +143,49 @@ export const HOUSE_MODELS = [
     sqft: 1620,
     bedrooms: 3,
     baths: 2,
-    features: 'Narrow-lot front gable with covered porch, open kitchen/living, rear patio slider.',
-    width: 35,
+    features: 'Narrow-lot front gable with covered porch, open kitchen/living, side slider to a raised patio.',
+    width: 34.5,
     renderingUrl: `${ASSET}/belmont-rendering.jpg`,
     planUrl: `${ASSET}/belmont-plan.jpg`,
     elevationUrl: `${ASSET}/belmont-elev.jpg`,
     defaultPalette: 'belmont-brochure',
     masses: [
-      { kind: 'house', x0: 0, x1: 30, d0: 0, d1: 60, roof: { ridge: 'd', gable: 'shake', frontAt: -6 }, autoWindows: ['left', 'right', 'rear'] },
-      { kind: 'garage', x0: 15, x1: 35, d0: -8, d1: 12, roof: { ridge: 'd', gable: 'shake' } },
+      { kind: 'house', x0: 0, x1: 30, d0: 0, d1: 60 },
+      { kind: 'garage', x0: 14.5, x1: 34.5, d0: -8.4, d1: 11.8 },
+    ],
+    roofs: [
+      { x0: 0, x1: 34.5, d0: -6, d1: 12.3, ridge: 'd', front: 'shake', back: 'lap' },
+      { x0: 0, x1: 30, d0: 12.3, d1: 60, ridge: 'd', front: null, back: 'lap' },
+      { x0: 14.5, x1: 34.5, d0: -8.4, d1: -5.8, ridge: 'd', front: 'shake', back: null },
     ],
     porch: {
-      x0: 0, x1: 15, d0: -6, d1: 0,
+      x0: 0, x1: 14.5, d0: -6, d1: 0,
       roof: null,
-      posts: [0.5, 14.4],
+      posts: [0.25, 8.6],
       postStyle: 'square',
-      steps: { x: 10.2, width: 4.5 },
+      steps: { x: 11.7, width: 6.6, count: 2 },
     },
-    garageDoor: { x: 25, d: -8, width: 16, height: 7 },
-    front: [
-      { type: 'window', x: 4.2, d: 0, w: 3, h: 5, shutters: true },
-      { type: 'door', x: 10.2, d: 0 },
-      { type: 'lamp', x: 12.6, d: 0, v: 6.4 },
-      { type: 'lamp', x: 16.3, d: -8, v: 7.2, onGarage: true },
-      { type: 'lamp', x: 33.7, d: -8, v: 7.2, onGarage: true },
+    garageDoor: { x: 25.1, d: -8.4, width: 16.6, height: 7.3 },
+    openings: [
+      win('front', 0, 4.4, { w: 2.9, h: 4.8, shutters: 'both' }),
+      { type: 'door', face: 'front', at: 0, pos: 11.7 },
+      { type: 'lamp', face: 'front', at: -8.4, pos: 16.0, v: 6.4, onGarage: true },
+      { type: 'lamp', face: 'front', at: -8.4, pos: 34.2, v: 6.4, onGarage: true },
+      win('left', 0, 4.0),
+      win('left', 0, 14.5),
+      small('left', 0, 22.2),
+      small('left', 0, 24.7),
+      win('left', 0, 37.6),
+      win('left', 0, 50.2),
+      small('right', 30, 19.3),
+      { type: 'slider', face: 'right', at: 30, pos: 26.3 },
+      { type: 'lamp', face: 'right', at: 30, pos: 30.8, v: 6.2 },
+      small('right', 30, 38.2),
+      win('right', 30, 49.0),
+      win('right', 30, 56.7),
     ],
-    plantingBeds: [
-      { x0: 0.3, x1: 7.6, d: -6 },
-    ],
+    decks: [{ x0: 30, x1: 40, d0: 21.3, d1: 31.3 }],
+    plantingBeds: [{ x0: 0.3, x1: 8.3, d: -6 }],
   },
   {
     id: 'keeneland',
@@ -135,41 +195,58 @@ export const HOUSE_MODELS = [
     sqft: 1635,
     bedrooms: 3,
     baths: 2,
-    features: 'Projecting dining wing with board-and-batten gables, recessed porch, side-entry front door.',
+    features: 'Projecting dining wing, recessed porch with a side-entry front door, garage set back 14½′, board-and-batten accent gables.',
     width: 50.5,
     renderingUrl: `${ASSET}/keeneland-rendering.jpg`,
     planUrl: `${ASSET}/keeneland-plan.jpg`,
     elevationUrl: `${ASSET}/keeneland-elev.jpg`,
     defaultPalette: 'keeneland-brochure',
+    // The projecting wing hides the porch from the left, so the hero shot looks from the right.
+    studioFrontAzimuth: 26,
     masses: [
-      { kind: 'house', x0: 0, x1: 30, d0: 7, d1: 58, roof: { ridge: 'd', gable: 'bnb', frontAt: 1 }, autoWindows: ['left', 'rear'] },
-      { kind: 'house', x0: 0, x1: 15, d0: 0, d1: 7, roof: { ridge: 'd', gable: 'bnb', backTo: 12 } },
-      { kind: 'garage', x0: 30, x1: 50.5, d0: 7.5, d1: 27.5, roof: { ridge: 'x', gable: 'lap' } },
+      { kind: 'house', x0: 0, x1: 15, d0: 0, d1: 7 },
+      { kind: 'house', x0: 0, x1: 30, d0: 7, d1: 58 },
+      { kind: 'garage', x0: 30, x1: 50.5, d0: 14.5, d1: 34.5 },
     ],
-    crossGables: [
-      { x0: 33, x1: 48, d0: 7.5, backTo: 15, gable: 'bnb', onGarage: true },
+    roofs: [
+      { x0: 0, x1: 30, d0: 7, d1: 58, ridge: 'd', front: 'bnb', back: 'lap' },
+      { x0: 0, x1: 15, d0: 0, d1: 7.4, ridge: 'd', front: 'lap', back: null },
+      // Garage side-gable ridge runs into the main roof.
+      { x0: 15, x1: 50.5, d0: 14.5, d1: 34.5, ridge: 'x', left: null, right: 'lap' },
+      { x0: 33.7, x1: 46.7, d0: 14.5, d1: 21, ridge: 'd', front: 'bnb', back: null },
     ],
+    sheds: [{ x0: 15, x1: 30, dLow: 1, dHigh: 7, rise: 3 }],
     porch: {
       x0: 15, x1: 30, d0: 1, d1: 7,
       roof: null,
-      posts: [29.4],
+      posts: [29.5],
       postStyle: 'square-dark',
-      steps: { x: 18.5, width: 5 },
+      steps: { x: 18, width: 6, count: 2 },
     },
-    garageDoor: { x: 40.2, d: 7.5, width: 16, height: 7 },
-    front: [
-      { type: 'window', x: 5.2, d: 0, w: 3, h: 5, shutters: true },
-      { type: 'window', x: 10.2, d: 0, w: 3, h: 5, shutters: true },
-      { type: 'window', x: 18.6, d: 7, w: 2.8, h: 5, shutters: true },
-      { type: 'window', x: 22.4, d: 7, w: 2.8, h: 5 },
-      { type: 'window', x: 26.2, d: 7, w: 2.8, h: 5, shutters: true },
-      { type: 'sideDoor', x: 15, d: 3.6 },
-      { type: 'lamp', x: 31.2, d: 7.5, v: 7.2, onGarage: true },
-      { type: 'lamp', x: 49.3, d: 7.5, v: 7.2, onGarage: true },
+    garageDoor: { x: 40.2, d: 14.5, width: 16.4, height: 7.1 },
+    openings: [
+      win('front', 0, 5.6, { w: 2.8, h: 4.5, shutters: 'left' }),
+      win('front', 0, 9.4, { w: 2.8, h: 4.5, shutters: 'right' }),
+      win('front', 7, 19.0, { w: 2.8, h: 4.5, shutters: 'left' }),
+      win('front', 7, 22.6, { w: 2.8, h: 4.5 }),
+      win('front', 7, 26.2, { w: 2.8, h: 4.5, shutters: 'right' }),
+      { type: 'door', face: 'right', at: 15, pos: 3.7 },
+      win('right', 30, 10.7, { w: 2.8, h: 4.5, shutters: 'both' }),
+      { type: 'door', face: 'right', at: 30, pos: 37.0, style: 'nineLite' },
+      win('left', 0, 3.2),
+      win('left', 0, 6.7),
+      small('left', 0, 15.9),
+      small('left', 0, 18.5),
+      win('left', 0, 26.4),
+      win('left', 0, 43.6),
+      win('left', 0, 53.8),
+      win('rear', 58, 27.4),
+      win('rear', 58, 18.1),
     ],
+    decks: [{ x0: 30, x1: 40, d0: 35, d1: 45 }],
     plantingBeds: [
       { x0: 0.5, x1: 15, d: 0 },
-      { x0: 21, x1: 30, d: 1 },
+      { x0: 21.2, x1: 30, d: 1 },
     ],
   },
   {
@@ -180,42 +257,63 @@ export const HOUSE_MODELS = [
     sqft: 1635,
     bedrooms: 3,
     baths: 2,
-    features: 'Keeneland massing with a front-facing entry, work-from-home room and 4th bedroom option.',
+    features: 'Keeneland massing with a street-facing front door, work-from-home room, side door to the kitchen; 4th bedroom option.',
     width: 50.5,
     renderingUrl: `${ASSET}/magnolia-rendering.jpg`,
     planUrl: `${ASSET}/magnolia-plan.jpg`,
     elevationUrl: `${ASSET}/magnolia-elev.jpg`,
     renderingNote: 'Plan set reuses the Keeneland rendering (marked "replace when new image is available").',
     defaultPalette: 'magnolia-brochure',
+    // The projecting wing hides the porch from the left, so the hero shot looks from the right.
+    studioFrontAzimuth: 26,
     masses: [
-      { kind: 'house', x0: 0, x1: 30, d0: 7, d1: 58, roof: { ridge: 'd', gable: 'bnb', frontAt: 1 }, autoWindows: ['left', 'rear'] },
-      { kind: 'house', x0: 0, x1: 15, d0: 0, d1: 7, roof: { ridge: 'd', gable: 'bnb', backTo: 12 } },
-      { kind: 'garage', x0: 30, x1: 50.5, d0: 7.5, d1: 27.5, roof: { ridge: 'x', gable: 'lap' } },
+      { kind: 'house', x0: 0, x1: 15, d0: 0, d1: 7 },
+      { kind: 'house', x0: 0, x1: 30, d0: 7, d1: 58 },
+      { kind: 'garage', x0: 30, x1: 50.5, d0: 14.5, d1: 34.5 },
     ],
-    crossGables: [
-      { x0: 33, x1: 48, d0: 7.5, backTo: 15, gable: 'bnb', onGarage: true },
+    roofs: [
+      { x0: 0, x1: 30, d0: 7, d1: 58, ridge: 'd', front: 'bnb', back: 'lap' },
+      { x0: 0, x1: 15, d0: 0, d1: 7.4, ridge: 'd', front: 'lap', back: null },
+      { x0: 15, x1: 50.5, d0: 14.5, d1: 34.5, ridge: 'x', left: null, right: 'lap' },
+      { x0: 33.7, x1: 46.7, d0: 14.5, d1: 21, ridge: 'd', front: 'bnb', back: null },
     ],
+    sheds: [{ x0: 15, x1: 30, dLow: 1, dHigh: 7, rise: 3 }],
     porch: {
       x0: 15, x1: 30, d0: 1, d1: 7,
       roof: null,
-      posts: [29.4],
+      posts: [29.5],
       postStyle: 'square-dark',
-      steps: { x: 17.4, width: 5 },
+      steps: { x: 18, width: 6, count: 2 },
     },
-    garageDoor: { x: 40.2, d: 7.5, width: 16, height: 7 },
-    front: [
-      { type: 'window', x: 5.2, d: 0, w: 3, h: 5, shutters: true },
-      { type: 'window', x: 10.2, d: 0, w: 3, h: 5, shutters: true },
-      { type: 'door', x: 17.4, d: 7 },
-      { type: 'window', x: 22.4, d: 7, w: 2.8, h: 5, shutters: true },
-      { type: 'window', x: 26.4, d: 7, w: 2.8, h: 5, shutters: true },
-      { type: 'lamp', x: 19.6, d: 7, v: 6.4 },
-      { type: 'lamp', x: 31.2, d: 7.5, v: 7.2, onGarage: true },
-      { type: 'lamp', x: 49.3, d: 7.5, v: 7.2, onGarage: true },
+    garageDoor: { x: 40.2, d: 14.5, width: 16.4, height: 7.1 },
+    openings: [
+      win('front', 0, 5.6, { w: 2.8, h: 4.5, shutters: 'left' }),
+      win('front', 0, 9.4, { w: 2.8, h: 4.5, shutters: 'right' }),
+      { type: 'door', face: 'front', at: 7, pos: 17.4 },
+      { type: 'lamp', face: 'front', at: 7, pos: 19.7, v: 6.0 },
+      win('front', 7, 22.8, { w: 2.8, h: 4.5, shutters: 'left' }),
+      win('front', 7, 26.5, { w: 2.8, h: 4.5, shutters: 'right' }),
+      { type: 'lamp', face: 'front', at: 14.5, pos: 31.0, v: 6.4, onGarage: true },
+      { type: 'lamp', face: 'front', at: 14.5, pos: 49.3, v: 6.4, onGarage: true },
+      win('right', 15, 4.1, { w: 2.8, h: 4.5 }),
+      win('left', 0, 17.3),
+      win('left', 0, 33.0),
+      win('left', 0, 41.2),
+      small('right', 30, 45.4),
+      small('right', 30, 48.0),
+      small('right', 30, 50.6),
+      { type: 'lamp', face: 'right', at: 30, pos: 52.9, v: 6.2 },
+      { type: 'door', face: 'right', at: 30, pos: 54.6, style: 'nineLite' },
+      win('rear', 58, 24.9),
+      win('rear', 58, 21.3),
+      win('rear', 58, 17.8),
+      win('rear', 58, 12.1),
+      win('rear', 58, 3.1),
     ],
+    decks: [{ x0: 30, x1: 34.5, d0: 52.4, d1: 56.8 }],
     plantingBeds: [
       { x0: 0.5, x1: 15, d: 0 },
-      { x0: 20.5, x1: 30, d: 1 },
+      { x0: 21.2, x1: 30, d: 1 },
     ],
   },
 ];
@@ -228,11 +326,12 @@ export const FOURPLEX_MODEL = {
   conceptual: true,
   defaultPalette: 'fourplex',
   masses: [
-    { kind: 'garage', x0: 0, x1: 88, d0: 0, d1: 40, eave: 19, roof: { ridge: 'x', gable: 'lap' }, autoWindows: ['left', 'right', 'rear'], twoStory: true },
+    { kind: 'garage', x0: 0, x1: 88, d0: 0, d1: 40, eave: 19, autoWindows: ['left', 'right', 'rear'], twoStory: true },
   ],
-  crossGables: [
-    { x0: 4, x1: 18, d0: 0, backTo: 8, gable: 'bnb', eave: 19 },
-    { x0: 70, x1: 84, d0: 0, backTo: 8, gable: 'bnb', eave: 19 },
+  roofs: [
+    { x0: 0, x1: 88, d0: 0, d1: 40, ridge: 'x', left: 'lap', right: 'lap', eave: 19 },
+    { x0: 4, x1: 18, d0: 0, d1: 8, ridge: 'd', front: 'bnb', back: null, eave: 19 },
+    { x0: 70, x1: 84, d0: 0, d1: 8, ridge: 'd', front: 'bnb', back: null, eave: 19 },
   ],
   porch: null,
   garageDoors: [
@@ -241,17 +340,15 @@ export const FOURPLEX_MODEL = {
     { x: 58.5, width: 9, height: 7.5 },
     { x: 80.5, width: 9, height: 7.5 },
   ],
-  front: [
-    ...[0, 1, 2, 3].flatMap((unit) => {
-      const base = unit * 22;
-      const doorX = unit < 2 ? base + 16 : base + 6;
-      return [
-        { type: 'door', x: doorX, d: 0, floor: 0.6 },
-        { type: 'window', x: base + 7, d: 0, w: 3, h: 4.5, sill: 12.5, floor: 0 },
-        { type: 'window', x: base + 15, d: 0, w: 3, h: 4.5, sill: 12.5, floor: 0 },
-      ];
-    }),
-  ],
+  openings: [0, 1, 2, 3].flatMap((unit) => {
+    const base = unit * 22;
+    const doorX = unit < 2 ? base + 16 : base + 6;
+    return [
+      { type: 'door', face: 'front', at: 0, pos: doorX, base: 0.6 },
+      { type: 'window', face: 'front', at: 0, pos: base + 7, w: 3, h: 4.5, base: 0, top: 17 },
+      { type: 'window', face: 'front', at: 0, pos: base + 15, w: 3, h: 4.5, base: 0, top: 17 },
+    ];
+  }),
   plantingBeds: [
     { x0: 13, x1: 20, d: 0 },
     { x0: 35, x1: 44, d: 0 },

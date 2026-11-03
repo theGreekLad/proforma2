@@ -117,3 +117,12 @@ body {
     flex-direction: column;
   }
 }
+
+.design-viewer-download {
+  margin-left: 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--accent);
+}

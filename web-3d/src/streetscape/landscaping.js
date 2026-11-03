@@ -432,7 +432,7 @@ const STREET_TREES = {
  * @param {object} layout from computeStreetLayout
  * @param {Map<string, object>} assignments lotId → { modelId, mirror, landscapeId }
  */
-export function generateLandscape(layout, assignments, { fences = false } = {}) {
+export function generateLandscape(layout, assignments, { fences = false, streetTrees = true, yardTrees = true, yardTreeSpread = 0.55 } = {}) {
   const sink = new PlantSink();
   const surfaces = new SurfaceSink();
 
@@ -474,7 +474,7 @@ export function generateLandscape(layout, assignments, { fences = false } = {}) 
     });
     if (model.porch?.steps && drives.length) {
       const sx = mirrorX(model, model.porch.steps.x, mirror);
-      const stepFront = -model.porch.d0 + 2;
+      const stepFront = -model.porch.d0 + (model.porch.steps.count ?? 2);
       const turnZ = Math.max(stepFront, walkFrontZ + 0.6);
       surfaces.polys.concrete.push(rectWorld(pl, sx - 1.8, sx + 1.8, stepFront - 0.3, turnZ + 3.6));
       const drive = drives[0];
@@ -494,9 +494,11 @@ export function generateLandscape(layout, assignments, { fences = false } = {}) 
     // Front-yard tree on the side away from the driveway.
     const gx = drives[0]?.gx ?? 0;
     const yardSide = gx > 0 ? -1 : 1;
-    const yardX = yardSide < 0 ? pl.latLo * 0.55 : pl.latHi * 0.55;
+    const yardX = yardSide < 0 ? pl.latLo * yardTreeSpread : pl.latHi * yardTreeSpread;
     const yard = pl.toWorld(yardX, fz - 10);
-    if (preset === 'builder') {
+    if (!yardTrees) {
+      // Studio renders keep the facade clear; shrubs and beds still apply.
+    } else if (preset === 'builder') {
       sink.tree(yard[0], yard[1], { height: 11, spread: 6, canopy: C.canopy[3], rand });
     } else if (preset === 'lush') {
       sink.tree(yard[0], yard[1], { height: 15, spread: 11, canopy: (lotLayout.lotNumber % 2) ? C.ornamentalPink : C.plum, rand });
@@ -523,7 +525,7 @@ export function generateLandscape(layout, assignments, { fences = false } = {}) 
     // Right-of-way: sidewalk, park strip, curb (with street trees by preset).
     lotLayout.streetEdges.forEach((edge) => {
       if (!edge.primary) {
-        streetStrips(surfaces, sink, edge, gravelYard, STREET_TREES[preset], rand);
+        streetStrips(surfaces, sink, edge, gravelYard, streetTrees ? STREET_TREES[preset] : null, rand);
         return;
       }
       const X0 = pl.frontLo - 2.2;
@@ -540,7 +542,7 @@ export function generateLandscape(layout, assignments, { fences = false } = {}) 
       });
       if (start < X1) surfaces.curbs.push({ a: pl.toWorld(start, curbZ), b: pl.toWorld(X1, curbZ), n: lotLayout.n, height: 0.5 });
 
-      const trees = STREET_TREES[preset];
+      const trees = streetTrees ? STREET_TREES[preset] : null;
       if (trees) {
         // Dense candidates; the global pass keeps the ones clear of driveways at proper spacing.
         const span = X1 - X0;

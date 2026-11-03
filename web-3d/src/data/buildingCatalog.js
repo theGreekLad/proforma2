@@ -25,6 +25,7 @@
  * @property {number} depth
  * @property {number[]} [unitWidths]
  * @property {string} renderingUrl
+ * @property {{ id: string, label: string, url: string, filename: string }[]} [renderViews]
  * @property {string} layoutUrl
  * @property {string} [endUnitSqFt]
  * @property {string} [middleUnitSqFt]
@@ -32,6 +33,22 @@
  * @property {string} description
  * @property {BuildingStyle} style
  */
+
+/** Renderings generated from the CrossMod plan sets by scripts/render-crossmod.cjs. */
+export const CROSSMOD_RENDER_VIEWS = [
+  { id: 'front', label: 'Front' },
+  { id: 'elevation', label: 'Front elevation' },
+  { id: 'rear', label: 'Rear' },
+  { id: 'aerial', label: 'Aerial' },
+];
+
+function crossmodRenderViews(slug) {
+  return CROSSMOD_RENDER_VIEWS.map((view) => ({
+    ...view,
+    url: `./building-assets/crossmod-renders/${slug}-${view.id}.jpg`,
+    filename: `delta-crossings-crossmod-${slug}-${view.id}.jpg`,
+  }));
+}
 
 /** @type {BuildingDesign[]} */
 export const BUILDING_CATALOG = [
@@ -181,11 +198,12 @@ export const BUILDING_CATALOG = [
     series: 'crossmod',
     width: 58,
     depth: 32,
-    renderingUrl: './building-assets/crossmod-keeneland-rendering.jpg',
+    renderingUrl: './building-assets/crossmod-renders/keeneland-front.jpg',
+    renderViews: crossmodRenderViews('keeneland'),
     layoutUrl: './building-assets/crossmod-keeneland-layout.png',
     dwellingSqFt: '1,635 SF',
     description:
-      'CrossMod 3258-32-1. Low ranch with a front gable over the left windows, a recessed porch, and a second gable over the two-car garage.',
+      'CrossMod 3258-32-1 · 3 bd / 2 ba. Projecting dining wing, recessed porch with a side-entry front door, garage set 14½′ behind the wing under a side-gable roof with a board-and-batten accent gable.',
     style: {
       bodyLight: '#d7d0c4',
       bodyDark: '#c4b8a4',
@@ -205,11 +223,12 @@ export const BUILDING_CATALOG = [
     series: 'crossmod',
     width: 58,
     depth: 32,
-    renderingUrl: './building-assets/crossmod-magnolia-rendering.jpg',
+    renderingUrl: './building-assets/crossmod-renders/magnolia-front.jpg',
+    renderViews: crossmodRenderViews('magnolia'),
     layoutUrl: './building-assets/crossmod-magnolia-layout.png',
     dwellingSqFt: '1,635 SF',
     description:
-      'CrossMod 3258-32-2. Same ranch massing as Keeneland, with the front door centered on the porch between two windows.',
+      'CrossMod 3258-32-2 · 3 bd / 2 ba. Keeneland massing with a street-facing front door at the left of the porch, two shuttered windows, and a side door to the kitchen.',
     style: {
       bodyLight: '#d7d0c4',
       bodyDark: '#c4b8a4',
@@ -229,11 +248,12 @@ export const BUILDING_CATALOG = [
     series: 'crossmod',
     width: 60,
     depth: 32,
-    renderingUrl: './building-assets/crossmod-belmont-rendering.jpg',
+    renderingUrl: './building-assets/crossmod-renders/belmont-front.jpg',
+    renderViews: crossmodRenderViews('belmont'),
     layoutUrl: './building-assets/crossmod-belmont-layout.png',
     dwellingSqFt: '1,620 SF',
     description:
-      'CrossMod 3260-32-1. One 5:12 shake gable over the whole front, with the entry left of a two-car garage.',
+      'CrossMod 3260-32-1 · 3 bd / 2 ba. Narrow-lot plan: a wide shake gable over the porch and garage, a second shake gable on the garage, and a side slider to a raised patio.',
     style: {
       bodyLight: '#c8c3ba',
       bodyDark: '#b7a48a',
@@ -253,11 +273,12 @@ export const BUILDING_CATALOG = [
     series: 'crossmod',
     width: 60,
     depth: 32,
-    renderingUrl: './building-assets/crossmod-aspen-rendering.jpg',
+    renderingUrl: './building-assets/crossmod-renders/aspen-front.jpg',
+    renderViews: crossmodRenderViews('aspen'),
     layoutUrl: './building-assets/crossmod-aspen-layout.png',
     dwellingSqFt: '1,620 SF',
     description:
-      'CrossMod 3260-32-2. Single shake gable. The door sits at the left, with windows between the door and the garage.',
+      'CrossMod 3260-32-2 · 3 bd / 2 ba + work-from-home. Narrow-lot plan with the door at the left of the porch, twin shuttered windows split by a porch post, and a rear entry stoop.',
     style: {
       bodyLight: '#cfc6b8',
       bodyDark: '#b7a48a',
@@ -277,11 +298,12 @@ export const BUILDING_CATALOG = [
     series: 'crossmod',
     width: 64,
     depth: 32,
-    renderingUrl: './building-assets/crossmod-hawthorne-rendering.jpg',
+    renderingUrl: './building-assets/crossmod-renders/hawthorne-front.jpg',
+    renderViews: crossmodRenderViews('hawthorne'),
     layoutUrl: './building-assets/crossmod-hawthorne-layout.png',
     dwellingSqFt: '1,620 SF',
     description:
-      'CrossMod 3264-32-1. Wider ranch with two shake gables: entry on the left, two-car garage under the right gable.',
+      'CrossMod 3264-32-1 · 3 bd / 2 ba. Wide ranch with a craftsman porch on stone piers, shake gables over the porch and garage, and a rear slider to a raised patio.',
     style: {
       bodyLight: '#d5d0c6',
       bodyDark: '#c4a36a',

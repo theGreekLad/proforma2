@@ -28,6 +28,7 @@ const PALETTE_KEYS = {
   roof: 'roof',
   shutter: 'shutter',
   door: 'door',
+  doorRear: 'door',
   post: 'post',
 };
 

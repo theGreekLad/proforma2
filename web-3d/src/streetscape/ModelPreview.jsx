@@ -6,7 +6,7 @@ import { getModelGeometries, modelExtents } from './houseBuilder';
 import { getModel, getPalette } from './houseModels';
 import { getGroundMaterials, getHouseMaterials } from './materials';
 
-const PALETTE_KEYS = { siding: 'siding', shake: 'gable', bnb: 'gable', roof: 'roof', shutter: 'shutter', door: 'door', post: 'post' };
+const PALETTE_KEYS = { siding: 'siding', shake: 'gable', bnb: 'gable', roof: 'roof', shutter: 'shutter', door: 'door', doorRear: 'door', post: 'post' };
 
 /** Single-model turntable used to check a model against its brochure rendering. */
 export default function ModelPreview({ modelId, mirror = false, angle = 0.45 }) {

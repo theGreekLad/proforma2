@@ -53,6 +53,7 @@ export default defineConfig({
         layouts: path.resolve(__dirname, 'layouts.html'),
         'area-info': path.resolve(__dirname, 'area-info.html'),
         streetscape: path.resolve(__dirname, 'streetscape.html'),
+        'crossmod-render': path.resolve(__dirname, 'crossmod-render.html'),
       },
     },
   },

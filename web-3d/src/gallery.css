@@ -263,11 +263,23 @@ button {
 
 .design-card-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.35rem;
 }
 
+.design-card-actions button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.design-card-actions button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
 .design-card-actions a,
+.design-card-actions button,
 .sheet-card a.open-link {
   display: inline-flex;
   align-items: center;
@@ -281,6 +293,7 @@ button {
 }
 
 .design-card-actions a:hover,
+.design-card-actions button:hover:not(:disabled),
 .sheet-card a.open-link:hover {
   background: rgba(61, 154, 139, 0.28);
 }
@@ -450,4 +463,94 @@ button {
   .gallery-header .header-actions {
     justify-content: flex-start;
   }
+}
+
+/* CrossMod rendering cards */
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 2rem 0 0.85rem;
+}
+
+.section-head .section-label {
+  margin: 0;
+}
+
+.download-all {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid rgba(61, 154, 139, 0.5);
+  background: rgba(61, 154, 139, 0.2);
+  color: var(--accent-light);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.download-all:hover:not(:disabled) {
+  background: rgba(61, 154, 139, 0.32);
+}
+
+.download-all:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.crossmod-card .design-card-media img.rendering {
+  aspect-ratio: 16 / 9;
+}
+
+.section-note.error {
+  color: #f87171;
+}
+
+.rendering-link {
+  display: block;
+  cursor: zoom-in;
+}
+
+.render-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.22);
+  border-top: 1px solid var(--border);
+}
+
+.render-tabs button {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.66rem;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+}
+
+.render-tabs button img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.render-tabs button:hover {
+  color: var(--text);
+}
+
+.render-tabs button.active {
+  border-color: var(--accent);
+  color: var(--accent-light);
 }

@@ -45,10 +45,22 @@ export default function DesignViewerPage() {
       </header>
 
       <main className="design-viewer-scroll">
-        <section className="design-viewer-section">
-          <h2>Rendering</h2>
-          <img src={design.renderingUrl} alt={`${design.name} exterior rendering`} />
-        </section>
+        {design.renderViews ? (
+          design.renderViews.map((view) => (
+            <section key={view.id} className="design-viewer-section">
+              <h2>
+                {view.label}{' '}
+                <a className="design-viewer-download" href={view.url} download={view.filename}>Download</a>
+              </h2>
+              <img src={view.url} alt={`${design.name} rendering, ${view.label.toLowerCase()} view`} />
+            </section>
+          ))
+        ) : (
+          <section className="design-viewer-section">
+            <h2>Rendering</h2>
+            <img src={design.renderingUrl} alt={`${design.name} exterior rendering`} />
+          </section>
+        )}
 
         <section className="design-viewer-section">
           <h2>Floor Plan Layout</h2>

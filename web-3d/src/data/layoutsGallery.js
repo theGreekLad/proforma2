@@ -63,6 +63,7 @@ export function getPrimaryDesignLayouts() {
     depth: design.depth,
     description: design.description,
     renderingUrl: design.renderingUrl,
+    renderViews: design.renderViews || null,
     layoutUrl: design.layoutUrl,
     series: design.series || 'concept',
     summary:

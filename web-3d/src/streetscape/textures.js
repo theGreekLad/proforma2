@@ -374,3 +374,33 @@ export function foliageTexture() {
     }
   }, { srgb: false, unit: true });
 }
+
+/** Rear entry door: 9-lite glass upper half over two short panels (UV 0..1). */
+export function nineLiteDoorTexture() {
+  return makeTexture('door9', 256, (ctx, size) => {
+    ctx.fillStyle = gray(0.92);
+    ctx.fillRect(0, 0, size, size);
+    const x0 = size * 0.2;
+    const w = size * 0.6;
+    const y0 = size * 0.08;
+    const h = size * 0.42;
+    ctx.fillStyle = gray(0.98);
+    ctx.fillRect(x0 - 4, y0 - 4, w + 8, h + 8);
+    for (let r = 0; r < 3; r += 1) {
+      for (let c = 0; c < 3; c += 1) {
+        ctx.fillStyle = '#2a333d';
+        ctx.fillRect(x0 + c * (w / 3) + 3, y0 + r * (h / 3) + 3, w / 3 - 6, h / 3 - 6);
+      }
+    }
+    ctx.fillStyle = gray(0.8);
+    ctx.fillRect(size * 0.2, size * 0.62, size * 0.25, size * 0.3);
+    ctx.fillRect(size * 0.55, size * 0.62, size * 0.25, size * 0.3);
+    ctx.fillStyle = gray(0.97);
+    ctx.fillRect(size * 0.22, size * 0.64, size * 0.21, size * 0.26);
+    ctx.fillRect(size * 0.57, size * 0.64, size * 0.21, size * 0.26);
+    ctx.fillStyle = '#9c8a5a';
+    ctx.beginPath();
+    ctx.arc(size * 0.86, size * 0.55, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }, { srgb: false, unit: true });
+}
