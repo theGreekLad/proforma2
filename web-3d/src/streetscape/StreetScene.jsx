@@ -502,7 +502,7 @@ function CameraRig({ mode, view, controlsRef, onModeChange }) {
       return;
     }
     const k = s.keys;
-    const speed = (k.shift ? 30 : 10) * dt;
+    const speed = (k.shift ? 90 : 36) * dt;
     const fwd = new THREE.Vector3(-Math.sin(s.yaw), 0, -Math.cos(s.yaw));
     const right = new THREE.Vector3(Math.cos(s.yaw), 0, -Math.sin(s.yaw));
     if (k.w || k.arrowup) camera.position.addScaledVector(fwd, speed);
