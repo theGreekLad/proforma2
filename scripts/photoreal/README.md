@@ -26,7 +26,7 @@ vegetation.py        grass, shrubs, flowers and trees (Geometry Nodes instancing
    python3.13 -m venv .bpy && .bpy/bin/pip install bpy
    ```
 
-3. Render (about 8 minutes per 2400×1350 image on 4 CPU cores):
+3. Render (8–15 minutes per 2400×1350 image on 4 CPU cores; aerials are slowest):
 
    ```bash
    .bpy/bin/python scripts/photoreal/render_photoreal.py scripts/photoreal/scenes \
