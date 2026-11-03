@@ -139,25 +139,29 @@ def curb_object(curbs, material):
 
 
 def mountains(material):
-    rng = random.Random(3)
+    """Low, hazy ridgelines on the horizon (Delta sits in a wide desert valley)."""
     bm = bmesh.new()
-    for radius, lo, hi, seed in ((15000, 300, 1500, 3), (11000, 120, 650, 9)):
+    for radius, lo, hi, seed in ((16000, 260, 720, 3), (12000, 90, 330, 9)):
         r = random.Random(seed)
-        segs = 160
+        phases = [r.random() * math.tau for _ in range(4)]
+        segs = 720
         ring = []
         for i in range(segs):
             a = i / segs * math.tau
-            h = lo + (math.sin(a * 3 + seed) * 0.5 + 0.5) * (hi - lo) * 0.6 + r.random() * (hi - lo) * 0.4
+            n = (0.5 * math.sin(a * 2 + phases[0]) + 0.25 * math.sin(a * 7 + phases[1])
+                 + 0.15 * math.sin(a * 19 + phases[2]) + 0.1 * math.sin(a * 43 + phases[3]))
+            h = lo + (n * 0.5 + 0.5) * (hi - lo) + r.random() * (hi - lo) * 0.04
             ring.append((math.cos(a) * radius, math.sin(a) * radius, h))
         for i in range(segs):
             x1, y1, h1 = ring[i]
             x2, y2, h2 = ring[(i + 1) % segs]
             vs = [bm.verts.new(v) for v in ((x1, y1, -80), (x2, y2, -80), (x2, y2, h2), (x1, y1, h1))]
             bm.faces.new(vs)
-    rng.random()
     mesh = bpy.data.meshes.new('mountains')
     bm.to_mesh(mesh)
     bm.free()
+    for poly in mesh.polygons:
+        poly.use_smooth = True
     obj = bpy.data.objects.new('mountains', mesh)
     obj.data.materials.append(material)
     obj.visible_shadow = False
@@ -255,11 +259,33 @@ def setup_world(sun_dir):
     return sky
 
 
+def straight_on_view(scene_data, aspect):
+    """Photographic front elevation: straight on, eye height, long lens, from across the street."""
+    box = scene_data['houseBox']
+    cx = (box['min'][0] + box['max'][0]) / 2
+    front_z = box['max'][2]
+    width = box['max'][0] - box['min'][0]
+    fov_v = 22.0
+    half_h = math.atan(math.tan(math.radians(fov_v / 2)) * aspect)
+    distance = max(width * 1.22, 46) / (2 * math.tan(half_h))
+    cam_z = front_z + distance
+    return {
+        'camera': {
+            'type': 'perspective',
+            'position': [cx, 5.5, cam_z],
+            'target': [cx, 7.0, front_z],
+            'fov': fov_v,
+            'aspect': aspect,
+        },
+        'straight_on': True,
+    }
+
+
 def photoreal_sun(view):
     """Raking light: mirror the camera across the facade so eaves and porches cast visible shadows."""
     cam = view['camera']
-    if cam['type'] == 'orthographic':
-        d = Vector((-0.55, 0.0, 0.75))
+    if cam['type'] == 'orthographic' or view.get('straight_on'):
+        d = Vector((-0.6, 0.0, 1.0))
     else:
         px, _, pz = cam['position']
         tx, _, tz = cam['target']
@@ -375,6 +401,8 @@ def configure_render(width, height, samples, transparent=False):
 def render_scene(scene_data, views, out_dir, width, height, samples):
     for view_id in views:
         view = scene_data['views'][view_id]
+        if view_id == 'elevation':
+            view = straight_on_view(scene_data, width / height)
         ortho = view['camera']['type'] == 'orthographic'
         reset_scene()
         configure_render(width, height, samples)

@@ -404,7 +404,7 @@ def grass_material():
     return g.mat
 
 
-def lawn(scene_data, lawn_mask, to_b, detail, region):
+def lawn(scene_data, lawn_mask, to_b, detail, region, name='lawn'):
     (x0, x1), (z0, z1) = region
     step = 0.8
     nx = int((x1 - x0) / step) + 1
@@ -420,16 +420,18 @@ def lawn(scene_data, lawn_mask, to_b, detail, region):
             x = x0 + i * step
             verts.append((x, -z, 0.05))
             w = 0.0
-            if lawn_mask(x, z):
+            if z0 < z and lawn_mask(x, z):
                 w = max(0.2, min(1.0, 1.3 - math.hypot(x - cx, z - cz) / 200))
+                if name != 'lawn':
+                    w = 1.0
             weights.append(w)
     faces = [(j * nx + i, j * nx + i + 1, (j + 1) * nx + i + 1, (j + 1) * nx + i) for j in range(nz - 1) for i in range(nx - 1)]
-    mesh = bpy.data.meshes.new('lawn')
+    mesh = bpy.data.meshes.new(name)
     mesh.from_pydata(verts, [], faces)
     mesh.update()
     attr = mesh.attributes.new('density', 'FLOAT', 'POINT')
     attr.data.foreach_set('value', weights)
-    obj = bpy.data.objects.new('lawn', mesh)
+    obj = bpy.data.objects.new(name, mesh)
     bpy.context.scene.collection.objects.link(obj)
     clump = grass_clump(grass_material())
     holder = bpy.data.collections.new('grass_src')
@@ -450,6 +452,39 @@ def lawn(scene_data, lawn_mask, to_b, detail, region):
     return obj
 
 
+def surrounding_trees(scene_data, keep_clear_until=None):
+    """Neighbourhood trees across the street and beside the lot, so rear and
+    aerial views have a tree line too (the exported backdrop sits behind the lot)."""
+    rng = random.Random(77)
+    box = scene_data['houseBox']
+    cx = (box['min'][0] + box['max'][0]) / 2
+    trees = {'canopy': [], 'trunk': [], 'conifer': []}
+
+    def add(x, z):
+        if rng.random() < 0.2:
+            trees['conifer'].append({'x': x, 'y': 0, 'z': z, 'sx': 9 + rng.random() * 5, 'sy': 28 + rng.random() * 18,
+                                     'sz': 9 + rng.random() * 5, 'color': 0x2c4a2a, 'rot': rng.random() * 6})
+            return
+        height = 26 + rng.random() * 20
+        spread = 22 + rng.random() * 12
+        trunk_h = height * 0.3
+        r = 0.12 + height * 0.018
+        trees['trunk'].append({'x': x, 'y': 0, 'z': z, 'sx': r, 'sy': trunk_h, 'sz': r, 'color': 0x5a4636, 'rot': rng.random() * 6})
+        canopy_h = height - trunk_h * 0.75
+        trees['canopy'].append({'x': x, 'y': trunk_h * 0.75 + canopy_h * 0.5, 'z': z, 'sx': spread / 2, 'sy': canopy_h / 2,
+                                'sz': spread / 2, 'color': 0x47752f, 'rot': rng.random() * 6})
+
+    for _ in range(26):  # across the street: front yards of the opposite row
+        x, z = cx + (rng.random() - 0.5) * 420, 80 + rng.random() * 170
+        if keep_clear_until is not None and z < keep_clear_until:
+            continue  # would stand between a straight-on camera and the house
+        add(x, z)
+    for side in (-1, 1):  # neighbouring back yards
+        for _ in range(7):
+            add(cx + side * (95 + rng.random() * 120), box['min'][2] - 40 + rng.random() * 120)
+    return trees
+
+
 def dress(scene_data, view, ortho, lawn_mask, to_b, detail=1.0):
     scene = bpy.context.scene
     _IMAGES.clear()  # images from a previous scene reset are gone
@@ -459,10 +494,19 @@ def dress(scene_data, view, ortho, lawn_mask, to_b, detail=1.0):
     place_plants(lib, scene_data['plants'], to_b, plants_coll)
     if not ortho:
         place_plants(lib, scene_data['backdrop'], to_b, plants_coll)
+        straight = view.get('straight_on')
+        clear = view['camera']['position'][2] + 25 if straight else None
+        place_plants(lib, surrounding_trees(scene_data, clear), to_b, plants_coll)
     box = scene_data['houseBox']
     wide = view['camera']['position'][1] > 20 or view['camera']['position'][2] < box['min'][2]
     pad_x, pad_z = (95, 75) if wide else (60, 45)
     region = ((box['min'][0] - pad_x, box['max'][0] + pad_x), (box['min'][2] - pad_z, 12.8))
     if ortho:
-        region = ((box['min'][0] - 40, box['max'][0] + 40), (box['max'][2] - 30, 12.8))
+        region = ((box['min'][0] - 40, box['max'][0] + 40), (box['min'][2] - 3, 12.8))
     lawn(scene_data, lawn_mask, to_b, detail, region)
+    if view.get('straight_on'):
+        # Foreground lawn on the camera's side of the street.
+        road_far = scene_data['ground']['roadFar']
+        cam_x, _, cam_z = view['camera']['position']
+        half = (box['max'][0] - box['min'][0]) * 0.9 + 30
+        lawn(scene_data, lawn_mask, to_b, detail, ((cam_x - half, cam_x + half), (road_far, cam_z - 6)), name='lawn_far')

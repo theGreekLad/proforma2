@@ -472,10 +472,11 @@ def field():
 
 
 def mountain():
+    # Distant ridges take on the sky's haze: mostly emission close to the horizon colour.
     g = Graph('mountain')
-    g.set('Base Color', (0.3, 0.34, 0.4, 1))
-    g.set('Emission Color', (0.42, 0.48, 0.58, 1))
-    g.set('Emission Strength', 0.35)
+    g.set('Base Color', (0.2, 0.23, 0.28, 1))
+    g.set('Emission Color', (0.5, 0.57, 0.68, 1))
+    g.set('Emission Strength', 0.55)
     g.set('Roughness', 1.0)
     return g.mat
 
@@ -519,7 +520,7 @@ def elevation_backdrop(scene_data, view, to_b):
     obj = bpy.data.objects.new('backdrop', mesh)
     obj.data.materials.append(g.mat)
     center_x = (box['min'][0] + box['max'][0]) / 2
-    obj.location = to_b((center_x, 0, box['min'][2] - 260))
+    obj.location = to_b((center_x, 0, box['min'][2] - 3))
     obj.visible_shadow = False
     obj.visible_diffuse = False
     obj.visible_glossy = False
