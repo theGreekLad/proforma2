@@ -26,6 +26,7 @@
  * @property {number[]} [unitWidths]
  * @property {string} renderingUrl
  * @property {{ id: string, label: string, url: string, filename: string }[]} [renderViews]
+ * @property {{ id: string, label: string, url: string, filename: string }[]} [photorealViews]
  * @property {string} layoutUrl
  * @property {string} [endUnitSqFt]
  * @property {string} [middleUnitSqFt]
@@ -47,6 +48,15 @@ function crossmodRenderViews(slug) {
     ...view,
     url: `./building-assets/crossmod-renders/${slug}-${view.id}.jpg`,
     filename: `delta-crossings-crossmod-${slug}-${view.id}.jpg`,
+  }));
+}
+
+/** Path-traced versions of the same views (scripts/photoreal/render_photoreal.py). */
+function crossmodPhotorealViews(slug) {
+  return CROSSMOD_RENDER_VIEWS.map((view) => ({
+    ...view,
+    url: `./building-assets/crossmod-photoreal/${slug}-${view.id}.jpg`,
+    filename: `delta-crossings-crossmod-${slug}-${view.id}-photoreal.jpg`,
   }));
 }
 
@@ -198,8 +208,9 @@ export const BUILDING_CATALOG = [
     series: 'crossmod',
     width: 58,
     depth: 32,
-    renderingUrl: './building-assets/crossmod-renders/keeneland-front.jpg',
+    renderingUrl: './building-assets/crossmod-photoreal/keeneland-front.jpg',
     renderViews: crossmodRenderViews('keeneland'),
+    photorealViews: crossmodPhotorealViews('keeneland'),
     layoutUrl: './building-assets/crossmod-keeneland-layout.png',
     dwellingSqFt: '1,635 SF',
     description:
@@ -223,8 +234,9 @@ export const BUILDING_CATALOG = [
     series: 'crossmod',
     width: 58,
     depth: 32,
-    renderingUrl: './building-assets/crossmod-renders/magnolia-front.jpg',
+    renderingUrl: './building-assets/crossmod-photoreal/magnolia-front.jpg',
     renderViews: crossmodRenderViews('magnolia'),
+    photorealViews: crossmodPhotorealViews('magnolia'),
     layoutUrl: './building-assets/crossmod-magnolia-layout.png',
     dwellingSqFt: '1,635 SF',
     description:
@@ -248,8 +260,9 @@ export const BUILDING_CATALOG = [
     series: 'crossmod',
     width: 60,
     depth: 32,
-    renderingUrl: './building-assets/crossmod-renders/belmont-front.jpg',
+    renderingUrl: './building-assets/crossmod-photoreal/belmont-front.jpg',
     renderViews: crossmodRenderViews('belmont'),
+    photorealViews: crossmodPhotorealViews('belmont'),
     layoutUrl: './building-assets/crossmod-belmont-layout.png',
     dwellingSqFt: '1,620 SF',
     description:
@@ -273,8 +286,9 @@ export const BUILDING_CATALOG = [
     series: 'crossmod',
     width: 60,
     depth: 32,
-    renderingUrl: './building-assets/crossmod-renders/aspen-front.jpg',
+    renderingUrl: './building-assets/crossmod-photoreal/aspen-front.jpg',
     renderViews: crossmodRenderViews('aspen'),
+    photorealViews: crossmodPhotorealViews('aspen'),
     layoutUrl: './building-assets/crossmod-aspen-layout.png',
     dwellingSqFt: '1,620 SF',
     description:
@@ -298,8 +312,9 @@ export const BUILDING_CATALOG = [
     series: 'crossmod',
     width: 64,
     depth: 32,
-    renderingUrl: './building-assets/crossmod-renders/hawthorne-front.jpg',
+    renderingUrl: './building-assets/crossmod-photoreal/hawthorne-front.jpg',
     renderViews: crossmodRenderViews('hawthorne'),
+    photorealViews: crossmodPhotorealViews('hawthorne'),
     layoutUrl: './building-assets/crossmod-hawthorne-layout.png',
     dwellingSqFt: '1,620 SF',
     description:

@@ -46,8 +46,11 @@ export default function DesignViewerPage() {
 
       <main className="design-viewer-scroll">
         {design.renderViews ? (
-          design.renderViews.map((view) => (
-            <section key={view.id} className="design-viewer-section">
+          [
+            ...(design.photorealViews || []).map((view) => ({ ...view, label: `${view.label} · photoreal`, key: `p-${view.id}` })),
+            ...design.renderViews.map((view) => ({ ...view, label: `${view.label} · model`, key: `m-${view.id}` })),
+          ].map((view) => (
+            <section key={view.key} className="design-viewer-section">
               <h2>
                 {view.label}{' '}
                 <a className="design-viewer-download" href={view.url} download={view.filename}>Download</a>

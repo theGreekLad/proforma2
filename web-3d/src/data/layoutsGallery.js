@@ -64,6 +64,7 @@ export function getPrimaryDesignLayouts() {
     description: design.description,
     renderingUrl: design.renderingUrl,
     renderViews: design.renderViews || null,
+    photorealViews: design.photorealViews || null,
     layoutUrl: design.layoutUrl,
     series: design.series || 'concept',
     summary:

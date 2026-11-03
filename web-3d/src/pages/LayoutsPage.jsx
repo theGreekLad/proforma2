@@ -12,10 +12,16 @@ function crossmodZipEntries(design) {
   const slug = slugOf(design);
   const ext = design.layoutUrl.split('.').pop();
   return [
-    ...design.renderViews.map((view) => ({ url: view.url, name: `${slug}/${view.filename}` })),
+    ...(design.photorealViews || []).map((view) => ({ url: view.url, name: `${slug}/photoreal/${view.filename}` })),
+    ...design.renderViews.map((view) => ({ url: view.url, name: `${slug}/model/${view.filename}` })),
     { url: design.layoutUrl, name: `${slug}/delta-crossings-crossmod-${slug}-floor-plan.${ext}` },
   ];
 }
+
+const RENDER_STYLES = [
+  { id: 'photoreal', label: 'Photoreal', key: 'photorealViews' },
+  { id: 'model', label: 'Model', key: 'renderViews' },
+];
 
 function useZipDownload() {
   const [busy, setBusy] = useState(null);
@@ -35,17 +41,37 @@ function useZipDownload() {
 }
 
 function CrossModCard({ design, zip }) {
-  const [viewId, setViewId] = useState(design.renderViews[0].id);
-  const view = design.renderViews.find((entry) => entry.id === viewId) || design.renderViews[0];
+  const styles = RENDER_STYLES.filter((style) => design[style.key]?.length);
+  const [styleId, setStyleId] = useState(styles[0].id);
+  const style = styles.find((entry) => entry.id === styleId) || styles[0];
+  const views = design[style.key];
+  const [viewId, setViewId] = useState(views[0].id);
+  const view = views.find((entry) => entry.id === viewId) || views[0];
   const slug = slugOf(design);
   return (
     <article className="design-card crossmod-card">
       <div className="design-card-media">
+        {styles.length > 1 && (
+          <div className="render-style" role="radiogroup" aria-label={`${design.name} rendering style`}>
+            {styles.map((entry) => (
+              <button
+                key={entry.id}
+                type="button"
+                role="radio"
+                aria-checked={entry.id === style.id}
+                className={entry.id === style.id ? 'active' : ''}
+                onClick={() => setStyleId(entry.id)}
+              >
+                {entry.label}
+              </button>
+            ))}
+          </div>
+        )}
         <a href={view.url} target="_blank" rel="noreferrer" className="rendering-link" title="Open full-size rendering">
-          <img className="rendering" src={view.url} alt={`${design.name} rendering, ${view.label.toLowerCase()} view`} loading="lazy" />
+          <img className="rendering" src={view.url} alt={`${design.name} ${style.label.toLowerCase()} rendering, ${view.label.toLowerCase()} view`} loading="lazy" />
         </a>
         <div className="render-tabs" role="tablist" aria-label={`${design.name} rendering views`}>
-          {design.renderViews.map((entry) => (
+          {views.map((entry) => (
             <button
               key={entry.id}
               type="button"
@@ -67,13 +93,15 @@ function CrossModCard({ design, zip }) {
         <div className="design-card-meta">{design.summary}</div>
         <p>{design.description}</p>
         <div className="design-card-actions">
-          <a href={view.url} download={view.filename}>Download {view.label.toLowerCase()}</a>
+          <a href={view.url} download={view.filename}>
+            Download {style.id === 'photoreal' ? 'photoreal ' : ''}{view.label.toLowerCase()}
+          </a>
           <button
             type="button"
             onClick={() => zip.run(design.id, crossmodZipEntries(design), `delta-crossings-crossmod-${slug}.zip`)}
             disabled={Boolean(zip.busy)}
           >
-            {zip.busy === design.id ? 'Preparing ZIP…' : 'All views + plan (.zip)'}
+            {zip.busy === design.id ? 'Preparing ZIP…' : 'All renderings + plan (.zip)'}
           </button>
           <a href={`${appUrl('design-viewer.html')}?design=${encodeURIComponent(design.id)}`} target="_blank" rel="noreferrer">
             Open full view
@@ -164,7 +192,8 @@ export default function LayoutsPage() {
           <h2>Building layouts &amp; renderings</h2>
           <p>
             Browse concept homes and Clayton CrossMod plans. CrossMod renderings are built from each plan
-            set&apos;s floor plan and all four exterior elevations, and can be downloaded individually or as a ZIP.
+            set&apos;s floor plan and all four exterior elevations, in photoreal and model styles, and can be
+            downloaded individually or as a ZIP.
           </p>
         </section>
 
@@ -197,7 +226,8 @@ export default function LayoutsPage() {
             </div>
             <p className="section-note">
               Front, front-elevation, rear and aerial views of each home, modeled from the window, door, porch and
-              roof layout on its plan sheets (A1.0 floor plan, A2.0 elevations). Floor plans are the sheets from each plan PDF.
+              roof layout on its plan sheets (A1.0 floor plan, A2.0 elevations). Photoreal views are path-traced from
+              the same models; Model views are the clean study renders. Floor plans are the sheets from each plan PDF.
             </p>
             {zip.error && <p className="section-note error">Download failed: {zip.error}</p>}
             <div className="design-grid">
