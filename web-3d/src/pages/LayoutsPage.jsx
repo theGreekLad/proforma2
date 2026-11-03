@@ -3,8 +3,50 @@ import SiteNav from '../components/SiteNav';
 import { getPrimaryDesignLayouts, ADDITIONAL_LAYOUT_SHEETS } from '../data/layoutsGallery';
 import { appUrl } from '../data/platUrls';
 
+function designTag(design) {
+  if (design.series === 'crossmod') return 'CrossMod';
+  if (design.category === 'single-family') return 'Single-Family';
+  return 'Townhome / Fourplex';
+}
+
+function DesignGrid({ designs }) {
+  return (
+    <div className="design-grid">
+      {designs.map((design) => (
+        <article key={design.id} className="design-card">
+          <div className="design-card-media">
+            <img className="rendering" src={design.renderingUrl} alt={`${design.name} rendering`} loading="lazy" />
+            <img
+              className={`layout${design.series === 'crossmod' ? ' layout-plan' : ''}`}
+              src={design.layoutUrl}
+              alt={`${design.name} floor plan`}
+              loading="lazy"
+            />
+          </div>
+          <div className="design-card-body">
+            <span className="design-card-tag">{designTag(design)}</span>
+            <h3>{design.name}</h3>
+            <div className="design-card-meta">{design.summary}</div>
+            <p>{design.description}</p>
+            <div className="design-card-actions">
+              <a
+                href={`${appUrl('design-viewer.html')}?design=${encodeURIComponent(design.id)}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open full view
+              </a>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 const FILTERS = [
   { id: 'all', label: 'All Designs' },
+  { id: 'crossmod', label: 'CrossMod' },
   { id: 'single-family', label: 'Single-Family' },
   { id: 'fourplex', label: 'Townhome / Fourplex' },
 ];
@@ -13,7 +55,14 @@ export default function LayoutsPage() {
   const [filter, setFilter] = useState('all');
   const designs = useMemo(() => getPrimaryDesignLayouts(), []);
 
-  const filtered = designs.filter((design) => filter === 'all' || design.category === filter);
+  const concepts = designs.filter(
+    (design) => design.series !== 'crossmod' && (filter === 'all' || design.category === filter),
+  );
+  const crossmod = designs.filter(
+    (design) =>
+      design.series === 'crossmod' &&
+      (filter === 'all' || filter === 'crossmod' || filter === 'single-family'),
+  );
   const sheets = ADDITIONAL_LAYOUT_SHEETS.filter(
     (sheet) => filter === 'all' || sheet.category === filter,
   );
@@ -32,9 +81,8 @@ export default function LayoutsPage() {
         <section className="gallery-hero">
           <h2>Building layouts &amp; renderings</h2>
           <p>
-            Browse single-family and townhome / fourplex options with matching exterior renderings and
-            floor-plan sheets. Open any design for a full-screen view with rendering on top and layout
-            below.
+            Browse concept homes and Clayton CrossMod plans. Each CrossMod card pairs a rendering made
+            from the front elevation with the floor plan from the plan set.
           </p>
         </section>
 
@@ -52,34 +100,22 @@ export default function LayoutsPage() {
           ))}
         </div>
 
-        <h3 className="section-label">Primary design options</h3>
-        <div className="design-grid">
-          {filtered.map((design) => (
-            <article key={design.id} className="design-card">
-              <div className="design-card-media">
-                <img className="rendering" src={design.renderingUrl} alt={`${design.name} rendering`} loading="lazy" />
-                <img className="layout" src={design.layoutUrl} alt={`${design.name} layout`} loading="lazy" />
-              </div>
-              <div className="design-card-body">
-                <span className="design-card-tag">
-                  {design.category === 'single-family' ? 'Single-Family' : 'Townhome / Fourplex'}
-                </span>
-                <h3>{design.name}</h3>
-                <div className="design-card-meta">{design.summary}</div>
-                <p>{design.description}</p>
-                <div className="design-card-actions">
-                  <a
-                    href={`${appUrl('design-viewer.html')}?design=${encodeURIComponent(design.id)}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Open full view
-                  </a>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+        {crossmod.length > 0 && (
+          <>
+            <h3 className="section-label">CrossMod plans</h3>
+            <p className="section-note">
+              Renderings follow the front elevation. Floor plans are the sheets from each plan PDF.
+            </p>
+            <DesignGrid designs={crossmod} />
+          </>
+        )}
+
+        {concepts.length > 0 && (
+          <>
+            <h3 className="section-label">Concept designs</h3>
+            <DesignGrid designs={concepts} />
+          </>
+        )}
 
         {sheets.length > 0 && (
           <>

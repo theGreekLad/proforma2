@@ -171,6 +171,14 @@ button {
   color: var(--accent-light);
 }
 
+.section-note {
+  margin: -0.35rem 0 0.9rem;
+  max-width: 42rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
 .design-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -213,6 +221,11 @@ button {
   aspect-ratio: 4 / 3;
   object-fit: cover;
   border-top: 1px solid var(--border);
+}
+
+.design-card-media img.layout.layout-plan {
+  object-fit: contain;
+  background: #f6f3ec;
 }
 
 .design-card-body {

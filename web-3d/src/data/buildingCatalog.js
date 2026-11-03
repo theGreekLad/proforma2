@@ -1,5 +1,6 @@
 /** @typedef {'gable' | 'low-pitch' | 'craftsman-gable'} RoofType */
-/** @typedef {'fourplex' | 'single-family'} BuildingCategory */
+/** @typedef {'fourplex' | 'single-family' | 'crossmod'} BuildingCategory */
+/** @typedef {'concept' | 'crossmod'} DesignSeries */
 
 /**
  * @typedef {Object} BuildingStyle
@@ -19,6 +20,7 @@
  * @property {string} name
  * @property {string} shortName
  * @property {BuildingCategory} category
+ * @property {DesignSeries} [series]
  * @property {number} width
  * @property {number} depth
  * @property {number[]} [unitWidths]
@@ -171,6 +173,126 @@ export const BUILDING_CATALOG = [
       wallHeight: 18,
     },
   },
+  {
+    id: 'crossmod-keeneland',
+    name: 'Keeneland',
+    shortName: 'Keeneland',
+    category: 'crossmod',
+    series: 'crossmod',
+    width: 58,
+    depth: 32,
+    renderingUrl: './building-assets/crossmod-keeneland-rendering.jpg',
+    layoutUrl: './building-assets/crossmod-keeneland-layout.png',
+    dwellingSqFt: '1,635 SF',
+    description:
+      'CrossMod 3258-32-1. Low ranch with a front gable over the left windows, a recessed porch, and a second gable over the two-car garage.',
+    style: {
+      bodyLight: '#d7d0c4',
+      bodyDark: '#c4b8a4',
+      roof: '#3c3c3c',
+      stone: '#6d4038',
+      garage: '#f3f3f1',
+      trim: '#f7f5f0',
+      roofType: 'gable',
+      wallHeight: 8,
+    },
+  },
+  {
+    id: 'crossmod-magnolia',
+    name: 'Magnolia',
+    shortName: 'Magnolia',
+    category: 'crossmod',
+    series: 'crossmod',
+    width: 58,
+    depth: 32,
+    renderingUrl: './building-assets/crossmod-magnolia-rendering.jpg',
+    layoutUrl: './building-assets/crossmod-magnolia-layout.png',
+    dwellingSqFt: '1,635 SF',
+    description:
+      'CrossMod 3258-32-2. Same ranch massing as Keeneland, with the front door centered on the porch between two windows.',
+    style: {
+      bodyLight: '#d7d0c4',
+      bodyDark: '#c4b8a4',
+      roof: '#3c3c3c',
+      stone: '#6d4038',
+      garage: '#f3f3f1',
+      trim: '#f7f5f0',
+      roofType: 'gable',
+      wallHeight: 8,
+    },
+  },
+  {
+    id: 'crossmod-belmont',
+    name: 'Belmont',
+    shortName: 'Belmont',
+    category: 'crossmod',
+    series: 'crossmod',
+    width: 60,
+    depth: 32,
+    renderingUrl: './building-assets/crossmod-belmont-rendering.jpg',
+    layoutUrl: './building-assets/crossmod-belmont-layout.png',
+    dwellingSqFt: '1,620 SF',
+    description:
+      'CrossMod 3260-32-1. One 5:12 shake gable over the whole front, with the entry left of a two-car garage.',
+    style: {
+      bodyLight: '#c8c3ba',
+      bodyDark: '#b7a48a',
+      roof: '#3c3c3c',
+      stone: '#6d4038',
+      garage: '#f3f3f1',
+      trim: '#f7f5f0',
+      roofType: 'gable',
+      wallHeight: 8,
+    },
+  },
+  {
+    id: 'crossmod-aspen',
+    name: 'Aspen',
+    shortName: 'Aspen',
+    category: 'crossmod',
+    series: 'crossmod',
+    width: 60,
+    depth: 32,
+    renderingUrl: './building-assets/crossmod-aspen-rendering.jpg',
+    layoutUrl: './building-assets/crossmod-aspen-layout.png',
+    dwellingSqFt: '1,620 SF',
+    description:
+      'CrossMod 3260-32-2. Single shake gable. The door sits at the left, with windows between the door and the garage.',
+    style: {
+      bodyLight: '#cfc6b8',
+      bodyDark: '#b7a48a',
+      roof: '#3c3c3c',
+      stone: '#6d4038',
+      garage: '#f3f3f1',
+      trim: '#f7f5f0',
+      roofType: 'gable',
+      wallHeight: 8,
+    },
+  },
+  {
+    id: 'crossmod-hawthorne',
+    name: 'Hawthorne',
+    shortName: 'Hawthorne',
+    category: 'crossmod',
+    series: 'crossmod',
+    width: 64,
+    depth: 32,
+    renderingUrl: './building-assets/crossmod-hawthorne-rendering.jpg',
+    layoutUrl: './building-assets/crossmod-hawthorne-layout.png',
+    dwellingSqFt: '1,620 SF',
+    description:
+      'CrossMod 3264-32-1. Wider ranch with two shake gables: entry on the left, two-car garage under the right gable.',
+    style: {
+      bodyLight: '#d5d0c6',
+      bodyDark: '#c4a36a',
+      roof: '#3c3c3c',
+      stone: '#6d4038',
+      garage: '#f3f3f1',
+      trim: '#f7f5f0',
+      roofType: 'gable',
+      wallHeight: 8,
+    },
+  },
 ];
 
 export const MIN_FOURPLEX_WIDTH = 100;
@@ -194,7 +316,9 @@ export function getCatalogForLot(lot) {
     return BUILDING_CATALOG.filter((design) => design.category === 'fourplex');
   }
   if (lot.type === 'single-family') {
-    return BUILDING_CATALOG.filter((design) => design.category === 'single-family');
+    return BUILDING_CATALOG.filter(
+      (design) => design.category === 'single-family' || design.category === 'crossmod',
+    );
   }
   return BUILDING_CATALOG;
 }

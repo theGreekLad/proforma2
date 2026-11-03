@@ -25,9 +25,11 @@ export default function DesignViewerPage() {
   }
 
   const summary =
-    design.category === 'single-family'
-      ? `${design.width}' × ${design.depth}' · ${design.dwellingSqFt}`
-      : `${design.width}' × ${design.depth}' · End ${design.endUnitSqFt} · Middle ${design.middleUnitSqFt}`;
+    design.series === 'crossmod'
+      ? `${design.width}' × ${design.depth}' module · ${design.dwellingSqFt}`
+      : design.category === 'single-family'
+        ? `${design.width}' × ${design.depth}' · ${design.dwellingSqFt}`
+        : `${design.width}' × ${design.depth}' · End ${design.endUnitSqFt} · Middle ${design.middleUnitSqFt}`;
 
   return (
     <div className="design-viewer">

@@ -64,9 +64,12 @@ export function getPrimaryDesignLayouts() {
     description: design.description,
     renderingUrl: design.renderingUrl,
     layoutUrl: design.layoutUrl,
+    series: design.series || 'concept',
     summary:
-      design.category === 'single-family'
-        ? `${design.width}' × ${design.depth}' · ${design.dwellingSqFt}`
-        : `${design.width}' × ${design.depth}' · End ${design.endUnitSqFt} · Middle ${design.middleUnitSqFt}`,
+      design.series === 'crossmod'
+        ? `${design.width}' × ${design.depth}' module · ${design.dwellingSqFt}`
+        : design.category === 'single-family'
+          ? `${design.width}' × ${design.depth}' · ${design.dwellingSqFt}`
+          : `${design.width}' × ${design.depth}' · End ${design.endUnitSqFt} · Middle ${design.middleUnitSqFt}`,
   }));
 }
